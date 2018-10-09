@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    triggers{
+        pollSCM('* * * * *')
+    }
+
     tools {
         maven 'localMaven'
     }
@@ -23,26 +28,17 @@ pipeline {
                 }
             }
         }
-        stage ('Deploy to Staging'){
-            steps {
-                build job: 'deploy-to-staging'
-            }
-        }
-        stage ('Deploy to Production'){
-            steps{
-                timeout(time:5, unit:'DAYS'){
-                    input message:'Approve PRODUCTION Deployment?'
+        stage ('Deployments') {
+            parallel {
+                stage ('Deploy to Staging'){
+                    steps {
+                        sh "curl -v -u tomcat:tomcat -T target/*.war http://172.30.3.31:8090/manager/text/deploy?path=&update=true"
+                    }
                 }
-
-                build job: 'Deploy-to-Prod'
-            }
-            post {
-                success {
-                    echo 'Code deployed to Production.'
-                }
-
-                failure {
-                    echo ' Deployment failed.'
+                stage ('Deploy to Production'){
+                    steps{
+                        sh "curl -v -u tomcat:tomcat -T target/*.war http://172.30.3.31:9090/manager/text/deploy?path=&update=true"
+                    }
                 }
             }
         }
