@@ -32,12 +32,12 @@ pipeline {
             parallel {
                 stage ('Deploy to Staging'){
                     steps {
-                        sh "curl -v -u tomcat:tomcat -T target/*.war http://172.30.3.31:8090/manager/text/deploy?path=&update=true"
+                        sh "curl -v -u tomcat:tomcat -T **/target/*.war http://172.30.3.31:8090/manager/text/deploy?path=&update=true"
                     }
                 }
                 stage ('Deploy to Production'){
                     steps{
-                        sh "curl -v -u tomcat:tomcat -T target/*.war http://172.30.3.31:9090/manager/text/deploy?path=&update=true"
+                        sh "curl -v -u tomcat:tomcat -T **/target/*.war http://172.30.3.31:9090/manager/text/deploy?path=&update=true"
                     }
                 }
             }
