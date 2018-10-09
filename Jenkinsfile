@@ -1,7 +1,8 @@
 pipeline {
     agent any
-    environment {
-        PATH = "/opt/apache-maven/bin:$PATH"
+    tools {
+        maven 'Maven 3.5.4'
+        jdk 'jdk8'
     }
     stages{
         stage('Initialize') {
