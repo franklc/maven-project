@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers{
-        pollSCM('* * * * *')
-    }
-
     tools {
         maven 'localMaven'
     }
@@ -17,7 +13,7 @@ pipeline {
                 '''
             }
         }
-        stage('Build'){
+        stage('Build app'){
             steps {
                 sh 'mvn clean package'
             }
@@ -28,18 +24,9 @@ pipeline {
                 }
             }
         }
-        stage ('Deployments') {
-            parallel {
-                stage ('Deploy to Staging'){
-                    steps {
-                        sh "cp **/target/*.war /opt/tomcat-staging/webapps"
-                    }
-                }
-                stage ('Deploy to Production'){
-                    steps{
-                        sh "cp **/target/*.war /opt/tomcat-prod/webapps"
-                    }
-                }
+        stage ('Build app container'){
+            steps {
+                sh "docker build . -t tomcatwebapp:${env.BUILD_ID}"
             }
         }
     }
